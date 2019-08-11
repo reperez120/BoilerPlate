@@ -7,11 +7,14 @@ const foldersService = {
     return knex.from('folders').select('*').where('id', id).first()
   },
 
-
-
   insertFolder(knex, newFolder) {
-    newFolder = {folder_name: newFolder.name}
+    newFolder = {
+      folder_name: newFolder.name,
+      id: newFolder.id,
+      contents: newFolder.contents
+    }
     console.log(newFolder)
+
     return knex
       .insert(newFolder)
       .into('folders')

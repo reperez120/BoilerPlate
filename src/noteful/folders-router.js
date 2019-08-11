@@ -22,7 +22,7 @@ foldersRouter
   })
 
   .post(bodyParser, (req, res, next) => {
-    const { name } = req.body
+    const { name, contents } = req.body
     const newFolder = { name } 
 
     for (const field of ['name']) {
@@ -48,7 +48,7 @@ foldersRouter
   })
 
 foldersRouter
-  .route('/folders/:folder_id')
+  .route('/:folder_id')
 
   .all((req, res, next) => {
     const { folder_id } = req.params
@@ -60,7 +60,6 @@ foldersRouter
             error: { message: `folder Not Found` }
           })
         }
-
         res.folder = folder
         next()
       })
@@ -68,12 +67,12 @@ foldersRouter
   })
 
   .get((req, res) => {
-    res.json(serializefolder(res.folder))
+    res.json(serializeFolder(res.folder))
   })
 
   .delete((req, res, next) => {
     const { folder_id } = req.params
-    foldersService.deletefolder(
+    foldersService.deleteFolder(
       req.app.get('db'),
       folder_id
     )
@@ -85,22 +84,23 @@ foldersRouter
   })
 
   .patch(bodyParser, (req, res, next) => {
-    const { id, name, content } = req.body
-    const noteToUpdate = { id, name, contents }
+    console.log(req.body)
+    const { name: folder_name } = req.body
+    const folderToUpdate = { folder_name }
 
     const numberOfValues = Object.values(folderToUpdate).filter(Boolean).length
     if (numberOfValues === 0) {
       console.error(`Invalid update without required fields`)
       return res.status(400).json({
         error: {
-          message: `Request body must content either 'title', 'url', 'description' or 'rating'`
+          message: `Request body must contain 'name'.`
         }
       })
     }
 
-    const error = getFolderValidationError(folderToUpdate)
+    // const error = getFolderValidationError(folderToUpdate)
 
-    if (error) return res.status(400).send(error)
+    // if (error) return res.status(400).send(error)
 
     foldersService.updateFolder(
       req.app.get('db'),
